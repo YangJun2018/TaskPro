@@ -1,12 +1,8 @@
 # coding:utf-8
 __author__ = 'YangJun'
 
-import logging
+import time
 
-
-class Logger():
-    def __init__(self, path, name):
-        self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.NOTSET)
-        # 初始化控制台输出
-        self.ch = logging.FileHandler
+nowtime = time.localtime(time.time())
+t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+print(t)
