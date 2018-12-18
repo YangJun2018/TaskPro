@@ -28,70 +28,67 @@ class Paramiko_ssh(object):
         stdin, stdout, stderr = self.ssh.exec_command('cd' + path + ';' + cmd)
         # print(str(stdout.read(), encoding='utf-8'))
 
-        class Paramiko_Put(object):
-            def __init__(self, ip, port, username, password, local_dir, remort_dir):
-                self.ip = ip
-                self.port = port
-                self.username = username
-                self.password = password
-                self.local_dir = local_dir
-                self.rt_dir = remort_dir
 
-            def pk_connect(self):
-                self.pk = paramiko.Transport(self.ip, self.port)
-                self.pk.connect(username=self.username, password=self.password)
-                try:
-                    return paramiko.SFTPClient.from_transport(self.pk)
-                except Exception as e:
-                    print('Connect error:%s') % e
-                    exit()
+class Paramiko_Put(object):
+    def __init__(self, ip, port, username, password, local_dir, remort_dir):
+        self.ip = ip
+        self.port = port
+        self.username = username
+        self.password = password
+        self.local_dir = local_dir
+        self.rt_dir = remort_dir
+    def pk_connect(self):
+        self.pk = paramiko.Transport(self.ip, self.port)
+        self.pk.connect(username=self.username, password=self.password)
+        try:
+            return paramiko.SFTPClient.from_transport(self.pk)
+        except Exception as e:
+            print('Connect error:%s') % e
+            exit()
+    def pk_put(self):
+        sftp = self.pk_connect()
+        # 本地上传目录和文件
+        files = os.listdir(self.local_dir)
+        cnt = 0
+        for file in files:
+            sftp.put(os.path.join(self.local_dir, file), os.path.join(self.rt_dir, file))
+            cnt += 1
+        if cnt == len(files):
+            print("% +' files put successful'" % cnt)
+        else:
+            print("put file error")
+    def __del__(self):
+        self.pk.close()
 
-            def pk_put(self):
-                sftp = self.pk_connect()
-                # 本地上传目录和文件
-                files = os.listdir(self.local_dir)
-                cnt = 0
-                for file in files:
-                    sftp.put(os.path.join(self.local_dir, file), os.path.join(self.rt_dir, file))
-                    cnt += 1
-                if cnt == len(files):
-                    print("% +' files put successful'") % cnt
-                else:
-                    print("put file error")
 
-            def __del__(self):
-                self.pk.close()
+class Paramiko_Get(object):
 
-        class Paramiko_Get(object):
-            def __init__(self, ip, port, username, password, local_dir, remort_dir):
-                self.ip = ip
-                self.port = port
-                self.username = username
-                self.password = password
-                self.local_dir = local_dir
-                self.rt_dir = remort_dir
-
-            def pk_connect(self):
-                self.pk = paramiko.Transport(self.ip, self.port)
-                self.pk.connect(username=self.username, password=self.password)
-                try:
-                    return paramiko.SFTPClient.from_transport(self.pk)
-                except Exception as e:
-                    print('Connect error:%s') % e
-                    exit()
-
-            def pk_put(self):
-                sftp = self.pk_connect()
-                # 本地上传目录和文件
-                files = sftp.listdir(self.local_dir)
-                cnt = 0
-                for file in files:
-                    sftp.get(os.path.join(self.rt_dir, file, os.path.join(self.local_dir, file)))
-                    cnt += 1
-                if cnt == len(files):
-                    print("% +' files get successful'") % cnt
-                else:
-                    print("get file error")
-
-            def __del__(self):
-                self.pk.close()
+    def __init__(self, ip, port, username, password, local_dir, remort_dir):
+        self.ip = ip
+        self.port = port
+        self.username = username
+        self.password = password
+        self.local_dir = local_dir
+        self.rt_dir = remort_dir
+    def pk_connect(self):
+        self.pk = paramiko.Transport(self.ip, self.port)
+        self.pk.connect(username=self.username, password=self.password)
+        try:
+            return paramiko.SFTPClient.from_transport(self.pk)
+        except Exception as e:
+            print('Connect error:%s') % e
+            exit()
+    def pk_put(self):
+        sftp = self.pk_connect()
+        # 本地上传目录和文件
+        files = sftp.listdir(self.local_dir)
+        cnt = 0
+        for file in files:
+            sftp.get(os.path.join(self.rt_dir, file, os.path.join(self.local_dir, file)))
+            cnt += 1
+        if cnt == len(files):
+            print("% +' files get successful'") % cnt
+        else:
+            print("get file error")
+    def __del__(self):
+        self.pk.close()
